@@ -1,5 +1,12 @@
-# Alunos participantes: Marina Medeiros
-                      Laura Macêdo
-                      Marcos Vinicius
+# Patrulha lunar
+
+# Alunos
+
+- Marina Medeiros
+- Laura Macêdo
+- Marcos Vinicius
                       
-# Professor: Leonardo Minora
+# Disciplina
+
+**Lógica de programação**
+**Professor**: Leonardo Minora
