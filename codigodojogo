@@ -1,0 +1,276 @@
+import
+pygame
+import
+random
+pygame.init()
+
+# Ícone
+icon = pygame.image.load('ship_ico.ico')
+
+# Arquivo De Sprite (player)
+spr_ship_up = [pygame.image.load('ship_up.png'),pygame.image.load('ship_up_2.png'),pygame.image.load('ship_up_2.png')]
+spr_ship_down = [pygame.image.load('ship_down.png'),pygame.image.load('ship_down_2.png'),pygame.image.load('ship_down_2.png')]
+spr_ship_dead =  [pygame.image.load('ship_dead.png')]
+
+# Arquivo De Sprite (Obstáculo)
+spr_obstaculo = [pygame.image.load('obst.png')]
+
+# Arquivo De Sprite (Obstáculo)
+spr_toprock = [pygame.image.load('top_rock.png')]
+spr_backrock = [pygame.image.load('bottom_rock.png')]
+
+# Posição X e Y(Player)
+x = 100
+y = 150
+
+# Frame do Sprite(Player)
+start = 0
+image_index = 0
+image_speed = 0.4
+
+# Sprite (Player)
+sprite_index = spr_ship_down
+
+# Velocidade (Player)
+vspeed = 0
+hspeed = 0
+limite = 8
+velocidade = 3
+
+# Fricção (Player)
+friction = 0.15
+
+# Posição X e Y(Obstáculo)
+c_x = +600
+c_y = -200
+
+# Posição X e Y(Cenário)
+bk1_x = 200
+bk2_x = 600
+bk3_x = 200
+bk4_x = 600
+
+# Pontuação
+check_score = 0
+score = 0
+best_score = 0
+
+# Cor De Tela
+cor = (0, 20, 60)
+
+# Tamanho De Tela
+largura = 600
+altura = 400
+
+# Tela (Nome e Ícone)
+pygame.display.set_icon(icon)
+pygame.display.set_caption('Flappy Ship')
+
+# Desenhando Tamanho de Tela
+tela = pygame.display.set_mode((largura, altura))
+
+# Janela Aberta
+aberto = True
+
+# Enquanto o Jogo Estiver Aberto
+while aberto == True:
+
+    # Atraso do Joogo
+    pygame.time.delay(10)
+
+    # Fechando Jogo [X]
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            aberto = False
+
+    # Frames Da Animação (Player)
+    if image_index >= len(sprite_index)-1:
+        image_index = 0
+    else:
+        image_index += image_speed
+
+    # Mudando Sprite (Player)
+    if start == 0:
+        # Parado
+        image_index = 1
+        sprite_index = spr_ship_down
+
+    if start == 1:
+        if vspeed > 0:
+            # Caindo
+            sprite_index  = spr_ship_down
+        else:
+            # Subindo
+            sprite_index  = spr_ship_up
+
+    if start == 2:
+        image_index = 0
+        sprite_index = spr_ship_dead
+
+
+    # Velocidade (Player)
+    y += vspeed
+    x += hspeed
+
+    # Botões
+    comandos = pygame.key.get_pressed()
+
+    # Botões: Saltar (Player)
+    if comandos[pygame.K_UP] and vspeed>-1 and start !=2:
+        vspeed = -5.5
+        start = 1
+
+    if start >= 2:
+        start += 1
+        vspeed += 0.2
+        if hspeed>0:
+            hspeed-=0.01
+        if y > 360:
+            x = 100
+            y = 150
+            c_x = +600
+            c_y = -200
+            start=0
+            vspeed = 0
+            hspeed = 0
+            velocidade = 3
+            check_score = 0
+            score = 0
+
+
+    # Limite De Tela Para Baixo (Player)
+    if y > 340:
+        # Morrer
+        if start < 2:
+            if score > best_score:
+                best_score = score
+            start = 2
+            vspeed = -5
+            hspeed = velocidade
+            velocidade = 0
+            if score == best_score and score > 0:
+                print('NOVO RECORDE DE', score, 'OBSTÁCULO(S)!')
+            else:
+                print('Melhor Pontuação:', best_score)
+                print('Pontuação Dessa Partida:', score)
+
+    elif vspeed < 10 and start == 1:
+        # Gravidade
+        vspeed += .24
+
+    # Limite De Tela Para Cima (Player)
+    if y < 0:
+        # Morrer
+        if start < 2:
+            if score > best_score:
+                best_score = score
+            start = 2
+            vspeed = -5
+            hspeed = velocidade
+            velocidade = 0
+            if score == best_score and score > 0:
+                print('NOVO RECORDE DE', score, 'OBSTÁCULO(S)!')
+            else:
+                print('Melhor Pontuação:', best_score)
+                print('Pontuação Dessa Partida:', score)
+
+    # Desenhando Cor de Fundo
+    tela.fill(cor)
+
+    # Desenhando Cenário
+    '''tela.blit(spr_backrock[0], (int(bk4_x), int(200)))'''
+    tela.blit(spr_backrock[0], (int(bk3_x), int(240)))
+    tela.blit(spr_toprock[0], (int(bk2_x), int(0)))
+    '''tela.blit(spr_toprock[0], (int(bk1_x), int(-40)))'''
+
+    # Desenhando Obstáculo
+    tela.blit(spr_obstaculo[0], (int(c_x), int(c_y)))
+
+    # Desenhando Player
+    tela.blit(sprite_index[int(image_index)], (int(x), int(y)))
+
+    # Cenário Repetindo 1
+    if bk1_x < -160:
+        bk1_x = 600
+    # Cenário Repetindo 2
+    if bk2_x < -160:
+        bk2_x = 600
+    # Cenário Repetindo 3
+    if bk3_x < -160:
+        bk3_x = 600
+    # Cenário Repetindo 4
+    if bk4_x < -160:
+        bk4_x = 600
+
+    # Obstáculo Repetindo
+    if c_x < -80:
+
+        # Posição de repetição X (Velocidade Rápida)
+        if velocidade > limite:
+            c_x = 800
+
+        # Posição de repetição X (Velocidade Média)
+        else:
+            c_x = 600
+
+        # Posição de repetição Y
+        c_y = random.randrange(-300,-100)
+
+        # Resetando checador de Ponto
+        check_score = 0
+
+    # Velocidade (Cenário)
+    if start == 1:
+        c_x -= velocidade
+        bk1_x -= velocidade-.5
+        bk2_x -= velocidade-.5
+        bk3_x -= velocidade-.8
+        bk4_x -= velocidade-.8
+
+    #
+    if x > c_x and check_score == 0 and start<2:
+        # Checando Ponto
+        check_score = 1
+
+        # Ganhando Ponto
+        score += 1
+
+        # Aumentando Velocidade (Jogo)
+        if velocidade < 16:
+            velocidade += 0.2
+            if vspeed > 8:
+                velocidade += 0.3
+
+        # Escrevendo Score e Velocidade
+        if score >= 2:
+            print(score, 'Obstáculos já foram passados!')
+        else:
+            print('1 Obstáculo já foi passado!')
+
+        print('Velocidade:', int(velocidade*2), 'Px/s')
+        print()
+
+    # Colisão Com Obstáculo X
+    if c_x-60 < x < c_x+60:
+        # Colisão Com Obstáculo Y
+        if c_y+120<y<c_y+320 or c_y+420<y<c_y+520:
+
+            #Fechando Jogo
+            if start < 2:
+                if score>best_score:
+                    best_score = score
+                start = 2
+                vspeed = -5
+                hspeed = velocidade
+                velocidade = 0
+                if score == best_score and score>0:
+                    print('NOVO RECORDE DE', score, 'OBSTÁCULO(S)!')
+                else:
+                    print('Melhor Pontuação:', best_score)
+                    print('Pontuação Dessa Partida:', score)
+
+    # Atualizando a Tela
+    pygame.display.update()
+
+# Fechando Flappy Ship
+pygame.quit()
